@@ -1,0 +1,7 @@
+[build]
+  functions="linehook"
+
+[[redirects]]
+  from = "/callback"
+  to = "/.netlify/functions/linehook"
+  status = 200
