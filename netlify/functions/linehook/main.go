@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,12 +13,14 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 
-	// _ "github.com/joho/godotenv/autoload"
+	_ "github.com/joho/godotenv/autoload"
 	"github.com/line/line-bot-sdk-go/v7/linebot"
 )
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
-	fmt.Println("This message will show up in the CLI console.")
+	// fmt.Println("req:", req.Headers["x-line-signature"])
+	// fmt.Println("ctx:", ctx)
+	// fmt.Println("This message will show up in the CLI console.")
 	// fmt.Println(os.Getenv("CHANNEL_SECRET"), os.Getenv("CHANNEL_ACCESS_TOKEN"))
 	bot, err := linebot.New(os.Getenv("CHANNEL_SECRET"), os.Getenv("CHANNEL_ACCESS_TOKEN"))
 	if err != nil {
@@ -27,7 +30,7 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (*events.AP
 	r := proxyRequest2httpRequest(&req)
 	event_set, err := bot.ParseRequest(r)
 	if err != nil {
-		if err == linebot.ErrInvalidSignature {
+		if errors.Is(err, linebot.ErrInvalidSignature) {
 			return &events.APIGatewayProxyResponse{
 				StatusCode:      400,
 				Headers:         map[string]string{"Content-Type": "text/plain"},
@@ -77,7 +80,6 @@ func proxyRequest2httpRequest(request *events.APIGatewayProxyRequest) *http.Requ
 		request.Path,
 		bytes.NewReader([]byte(request.Body)),
 	)
-
 	if err != nil {
 		fmt.Printf("Convert To Request Failed")
 	}

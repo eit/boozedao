@@ -1,5 +1,5 @@
 [build]
-  functions="linehook"
+  functions="functions"
 
 [[redirects]]
   from = "/callback"
