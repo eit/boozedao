@@ -6,9 +6,11 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math/rand"
 	"net/http"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -45,11 +47,23 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (*events.AP
 		}
 	}
 
+	messages := []string{
+		"愛你",
+		"愛你啦",
+		"好啦愛你啦",
+		"<3",
+	}
+
 	for _, event := range event_set {
 		if event.Type == linebot.EventTypeMessage {
 			switch message := event.Message.(type) {
 			// Handle only on text message
 			case *linebot.TextMessage:
+				rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
+				reply := messages[rand.Intn(len(messages))]
+				if _, err = bot.ReplyMessage(event.ReplyToken, linebot.NewTextMessage(reply)).Do(); err != nil {
+					log.Print(err)
+				}
 
 			// Handle only on Sticker message
 			case *linebot.StickerMessage:
