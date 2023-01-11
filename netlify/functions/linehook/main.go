@@ -21,7 +21,6 @@ import (
 
 func handler(ctx context.Context, req events.APIGatewayProxyRequest) (*events.APIGatewayProxyResponse, error) {
 	fmt.Println("req:", req)
-	log.Println("req log:", req)
 	// fmt.Println("ctx:", ctx)
 	// fmt.Println("This message will show up in the CLI console.")
 	// fmt.Println(os.Getenv("CHANNEL_SECRET"), os.Getenv("CHANNEL_ACCESS_TOKEN"))
@@ -61,11 +60,12 @@ func handler(ctx context.Context, req events.APIGatewayProxyRequest) (*events.AP
 			// Handle only on text message
 			case *linebot.TextMessage:
 				var reply string
-				if strings.Contains(message.Text, "口味") {
+				switch {
+				case strings.Contains(message.Text, "口味"):
 					reply = "西西里開心果\n水梨油菊\n大便巧克力\n撒尿牛丸\n" + "每種口味都好棒棒，搭配調酒更是爽到不行"
-				} else if strings.Contains(message.Text, "介紹") {
+				case strings.Contains(message.Text, "介紹"):
 					reply = "我們是 Gelato Bar 所以有 Gelato 也有 Wine/Cocktail and we have coffee as well"
-				} else {
+				default:
 					rand.Seed(time.Now().Unix()) // initialize global pseudo random generator
 					reply = messages[rand.Intn(len(messages))]
 				}
